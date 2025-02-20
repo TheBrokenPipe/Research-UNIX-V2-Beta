@@ -1,14 +1,42 @@
 # Research-UNIX-V2-Beta
-A Research UNIX V2 Beta from 1972 brought back to life.
+A Research UNIX V2 beta from 1972 brought back to life.
 
 This copy of Research UNIX is dated mid-1972 and sits between V1 and V2. Its kernel offers a 16 KiB (8K word) user core and is capable of executing UNIX V2 (0407) a.out formatted executables; however, none of the V2 syscalls are supported. It is the earliest surviving version of UNIX in machine-readable form.
 
 It comes from the "s1" and "s2" tapes given to [@DoctorWkt](https://github.com/DoctorWkt) by Dennis Ritchie in 1997. The "s1" tape is a copy of the UNIX INIT DECtape containing the kernel and tools necessary for restoring the system from DECtapes, and the "s2" tape contains the rest of the system.
 
-The entire system resides on an RF disk, with /usr also stored on the RF. This repo provides an image file of the RF disk - `s1s2unix_rf.img`.
+The entire system resides on an RF disk, with /usr also stored on the RF. This repo provides an image file of the RF disk - [`s1s2unix_rf.img`](./s1s2unix_rf.img).
 
 # Emulation
-To date, [@aap](https://github.com/aap)'s [PDP-11 emulator](https://github.com/aap/pdp11) is the only emulator capable of booting this version of UNIX.
+There are two emulators known to boot this version of UNIX. [SIMH](https://opensimh.org) and [@aap](https://github.com/aap)'s [PDP-11 emulator](https://github.com/aap/pdp11).
+
+My config for SIMH is as follows:
+```
+set cr disabled
+set xq disabled
+set rk disabled
+set hk disabled
+set rha disabled
+set tm disabled
+set rx disabled
+set rl disabled
+set tq disabled
+set dci disabled
+set cpu 11/20
+set cpu 32K
+set ke enabled
+set rf 2p
+set rf enabled
+att rf s1s2unix_rf.img         <-- RF disk image
+set tc enabled
+set tc locked
+att tc s1.itp                  <-- s1 tape
+load m792low.load              <-- Modified UNIX ROM from unix-june72 project
+dep system sr 173700
+go 73700                       <-- Low address used by the modded ROM
+```
+
+While you technically can boot from the `s1` tape, it does not let you login due to `/etc/passwd` being missing, so you'll not be able to install it the intended way. Right now, just use my hand-rolled RF disk image and boot from the RF. Once booted, it looks something like:
 
 ```
 login: root
